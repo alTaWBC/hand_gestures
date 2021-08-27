@@ -1,6 +1,7 @@
 import pandas as pd
 from pynput import keyboard, mouse
 import time
+from keyboard import release
 
 columns = ['Controller', 'Type', 'Button',
            'Coordinates', 'ScrollDirection', 'Time']
@@ -10,18 +11,29 @@ mouse_controller = mouse.Controller()
 keyboard_controller = keyboard.Controller()
 
 position = mouse_controller.position
+mouse_listener = mouse.Listener(
+    on_click=mouse_click,
+    on_move=mouse_move,
+    on_scroll=mouse_scroll
+)
+keyboard_listener = keyboard.Listener(
+    on_press=keyboard_press,
+    on_release=keyboard_release
+)
 
 
 def clear():
-    global events
+    global events, position
+    position = mouse_controller.position
     events = pd.DataFrame(columns=columns).append({
         'Controller': 'Mouse',
         'Type': 'Initial',
         'Button': 'None',
-        'Coordinates': mouse_controller.position,
+        'Coordinates': position,
         'ScrollDirection': (0, 0),
         'Time': time.time()
     }, ignore_index=True)
+    create_listeners()
 
 
 def mouse_click(x, y, button, pressed):
@@ -87,17 +99,17 @@ def keyboard_release(key):
     }, ignore_index=True)
 
 
-mouse_listener = mouse.Listener(
-    on_click=mouse_click,
-    on_move=mouse_move,
-    on_scroll=mouse_scroll
-)
-
-
-keyboard_listener = keyboard.Listener(
-    on_press=keyboard_press,
-    on_release=keyboard_release
-)
+def create_listeners():
+    global mouse_listener, keyboard_listener
+    mouse_listener = mouse.Listener(
+        on_click=mouse_click,
+        on_move=mouse_move,
+        on_scroll=mouse_scroll
+    )
+    keyboard_listener = keyboard.Listener(
+        on_press=keyboard_press,
+        on_release=keyboard_release
+    )
 
 
 def start():
@@ -114,6 +126,7 @@ def stop():
 def play():
     previous = -1
     for _, line in events.iterrows():
+        print(line)
         waitTime = line.Time - previous if previous != -1 else 0
         previous = line.Time
         event_controller = line.Controller
@@ -123,12 +136,14 @@ def play():
                       line.Coordinates, line.ScrollDirection)
         elif event_controller == 'Keyboard':
             playKeyboard(line.Type, line.Button)
+    keyboard_controller.release(keyboard.Key.shift)
+    # TODO: REMOVE WHEN USING BUTTONS
 
 
 def playMouse(types, button, coordinates, scroll):
     if types == 'Initial':
         mouse_controller.move(
-            coordinates[0] - mouse_controller.position[0], coordinates[1] - mouse_controller.position[0])
+            coordinates[0] - mouse_controller.position[0], coordinates[1] - mouse_controller.position[1])
     else:
         mouse_controller.move(coordinates[0], coordinates[1])
         if types == 'Press':
