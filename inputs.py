@@ -137,6 +137,8 @@ def playMouse(types, button, coordinates, scroll):
             mouse_controller.release(button)
         elif types == 'scroll':
             mouse_controller.scroll(scroll[0], scroll[1])
+        elif types == 'Move':
+            pass
         else:
             print(types, 'is not supported')
 
