@@ -4,13 +4,15 @@ import time
 events = []
 
 
-def record_mouse():
+def start(events=events):
     mouse.hook(events.append)
 
 
-def stop_recording():
+def stop(events=events):
     mouse.unhook(events.append)
-
+    
+def play(events=events):
+    mouse.play(events)
 
 def click(key):
     assert key in ['left', 'right', 'middle']
@@ -34,3 +36,4 @@ def postion():
 def pressed(key):
     assert key in ['left', 'right', 'middle']
     return mouse.is_pressed(key)
+
