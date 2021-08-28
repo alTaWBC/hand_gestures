@@ -126,7 +126,6 @@ def stop():
 def play():
     previous = -1
     for _, line in events.iterrows():
-        print(line)
         waitTime = line.Time - previous if previous != -1 else 0
         previous = line.Time
         event_controller = line.Controller

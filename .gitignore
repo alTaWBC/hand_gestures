@@ -2,3 +2,4 @@ vscode
 mypy_cache
 environment
 __pycache__
+collected_images
