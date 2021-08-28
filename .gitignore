@@ -3,3 +3,5 @@ mypy_cache
 environment
 __pycache__
 hand_gestures/collected_images/*
+hand_gestures/labelled_images/*
+hand_gestures/relevant_files/*
